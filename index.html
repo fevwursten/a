@@ -1,0 +1,492 @@
+<script>
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdmOwK3MeR__gaScFtslQO0jfHoJhi4nzISR2l26CmSMQKCh8BxQ0gcmMq7izQiq0rng/exec';
+    
+    let currentEditName = '';
+    let countdownInterval = null;
+    let archivierungsDatum = null;
+    let statusGeladen = false;
+    
+    // Hole aktuelle Zeit in Berlin (MEZ/MESZ)
+    function getBerlinTime() {
+        return new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
+    }
+    
+    // Berechne den aktuellen Freitag-Zeitraum
+    function getAktuellerFreitagZeitraum() {
+        const jetzt = getBerlinTime();
+        const tagDerWoche = jetzt.getDay();
+        const stunde = jetzt.getHours();
+        
+        let letzterFreitag = new Date(jetzt);
+        let tageZurueck = (tagDerWoche + 7 - 5) % 7;
+        if (tagDerWoche === 5 && stunde >= 9) {
+            tageZurueck = 0;
+        } else if (tageZurueck === 0) {
+            tageZurueck = 7;
+        }
+        letzterFreitag.setDate(jetzt.getDate() - tageZurueck);
+        letzterFreitag.setHours(9, 0, 0, 0);
+        
+        return letzterFreitag;
+    }
+    
+    // Berechne nächsten Freitag 09:00 in Berlin-Zeit
+    function getNaechstenFreitagDeadline() {
+        const jetzt = getBerlinTime();
+        const tagDerWoche = jetzt.getDay();
+        const stunde = jetzt.getHours();
+        
+        let deadline = new Date(jetzt);
+        deadline.setHours(9, 0, 0, 0);
+        
+        if (tagDerWoche === 5 && stunde < 9) {
+            return deadline;
+        }
+        else if (tagDerWoche === 5 && stunde >= 9) {
+            deadline.setDate(jetzt.getDate() + 7);
+        }
+        else if (tagDerWoche < 5) {
+            deadline.setDate(jetzt.getDate() + (5 - tagDerWoche));
+        }
+        else {
+            deadline.setDate(jetzt.getDate() + (5 + 7 - tagDerWoche));
+        }
+        
+        return deadline;
+    }
+    
+    // Formatiere Datum schön
+    function formatiereDatum(datum) {
+        const optionen = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return datum.toLocaleDateString('de-DE', optionen);
+    }
+    
+    // Prüfe ob Event geschlossen ist
+    function istEventGeschlossen() {
+        // Warte bis Status geladen ist
+        if (!statusGeladen) {
+            return false; // Erstmal offen, bis wir wissen ob archiviert
+        }
+        
+        // Wenn nicht archiviert, prüfe nur normale Deadline
+        if (!archivierungsDatum) {
+            const jetzt = getBerlinTime();
+            const deadline = getNaechstenFreitagDeadline();
+            return jetzt >= deadline;
+        }
+        
+        // Wenn archiviert, prüfe ob wir noch im gleichen Freitag-Zeitraum sind
+        const archivDatum = new Date(archivierungsDatum);
+        const aktuellerFreitagStart = getAktuellerFreitagZeitraum();
+        const naechsterFreitagStart = new Date(aktuellerFreitagStart);
+        naechsterFreitagStart.setDate(naechsterFreitagStart.getDate() + 7);
+        
+        const jetzt = getBerlinTime();
+        
+        // Wenn Archivierung im aktuellen Freitag-Zeitraum war, ist es noch geschlossen
+        if (archivDatum >= aktuellerFreitagStart && jetzt < naechsterFreitagStart) {
+            return true;
+        }
+        
+        // Neuer Zeitraum hat begonnen - öffne wieder
+        archivierungsDatum = null;
+        
+        // Prüfe normale Deadline
+        const deadline = getNaechstenFreitagDeadline();
+        return jetzt >= deadline;
+    }
+    
+    // Lade Archivierungs-Status (mit Callback)
+    function ladeArchivierungsStatus(callback) {
+        fetch(`${APPS_SCRIPT_URL}?type=status`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.archiviert) {
+                    archivierungsDatum = data.archiviert;
+                    console.log('Archivierung gefunden:', archivierungsDatum);
+                }
+                statusGeladen = true;
+                if (callback) callback();
+            })
+            .catch(e => {
+                console.error('Fehler beim Laden des Status:', e);
+                statusGeladen = true;
+                if (callback) callback();
+            });
+    }
+    
+    // Update Countdown
+    function updateCountdown() {
+        const jetzt = getBerlinTime();
+        const deadline = getNaechstenFreitagDeadline();
+        const diff = deadline - jetzt;
+        
+        const countdownElement = document.getElementById('countdown');
+        const countdownBox = document.getElementById('countdown-box');
+        const geschlossen = istEventGeschlossen();
+        
+        if (diff <= 0 || geschlossen) {
+            countdownElement.textContent = geschlossen ? 'GESCHLOSSEN' : 'ABGELAUFEN';
+            countdownBox.classList.add('countdown-expired');
+            
+            const warningText = archivierungsDatum ? 
+                '⏰ Event wurde vorzeitig geschlossen!<br>Bitte wende dich direkt an <strong>Andreas</strong><br><small>Neue Bestellungen ab nächstem Montag möglich</small>' :
+                '⏰ Anmeldeschluss überschritten!<br>Bitte wende dich direkt an <strong>Andreas</strong>';
+            
+            document.getElementById('deadline-warning').innerHTML = warningText;
+            document.getElementById('deadline-warning').classList.remove('hidden');
+            document.getElementById('form-container').classList.add('hidden');
+            
+            if (countdownInterval && geschlossen) {
+                clearInterval(countdownInterval);
+            }
+            return;
+        }
+        
+        const tage = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const stunden = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minuten = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const sekunden = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        const tageStr = tage > 0 ? `${tage}d ` : '';
+        const stundenStr = String(stunden).padStart(2, '0');
+        const minutenStr = String(minuten).padStart(2, '0');
+        const sekundenStr = String(sekunden).padStart(2, '0');
+        
+        countdownElement.textContent = `${tageStr}${stundenStr}:${minutenStr}:${sekundenStr}`;
+    }
+    
+    // Initialisiere Datum im Titel
+    function initDatum() {
+        const deadline = getNaechstenFreitagDeadline();
+        const datumText = formatiereDatum(deadline);
+        document.getElementById('datum-titel').textContent = datumText;
+        
+        const deadlineText = deadline.toLocaleDateString('de-DE', { 
+            weekday: 'long', 
+            day: 'numeric', 
+            month: 'long',
+            year: 'numeric'
+        }) + ', 09:00 Uhr';
+        document.getElementById('deadline-text').textContent = deadlineText;
+        
+        updateCountdown();
+        countdownInterval = setInterval(updateCountdown, 1000);
+        
+        if (istEventGeschlossen()) {
+            document.getElementById('deadline-warning').classList.remove('hidden');
+            document.getElementById('form-container').classList.add('hidden');
+        }
+    }
+    
+    // Hash-Funktion (SHA-256)
+    async function hashPassword(password) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
+    }
+    
+    // Tab-Wechsel
+    function showTab(tab) {
+        if (istEventGeschlossen()) return;
+        
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        
+        if (tab === 'neue') {
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.getElementById('tab-neue').classList.add('active');
+        } else {
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.getElementById('tab-bearbeiten').classList.add('active');
+        }
+    }
+    
+    // Bestellungen laden
+    function laden() {
+        fetch(APPS_SCRIPT_URL)
+            .then(r => r.json())
+            .then(data => {
+                let html = '';
+                let summeW = 0;
+                let summeB = 0;
+                
+                if (data && data.length > 0) {
+                    data.forEach(d => {
+                        const w = parseInt(d.Wuerste) || 0;
+                        const b = parseInt(d.Brezn) || 0;
+                        summeW += w;
+                        summeB += b;
+                        html += `<div class="order"><b>${d.Name || 'Unbekannt'}</b>: ${w} Würste, ${b} Brezn</div>`;
+                    });
+                } else {
+                    html = '<p>Noch keine Bestellungen</p>';
+                }
+                
+                document.getElementById('liste').innerHTML = html;
+                document.getElementById('summe').innerHTML = 
+                    `🌭 ${summeW} Würste | 🥨 ${summeB} Brezn`;
+            })
+            .catch(e => {
+                console.error('Fehler beim Laden:', e);
+                document.getElementById('liste').innerHTML = 
+                    '<p style="color:red;">Fehler beim Laden!</p>';
+            });
+    }
+    
+    // Historie laden
+    function ladeHistorie() {
+        fetch(`${APPS_SCRIPT_URL}?type=historie`)
+            .then(r => r.json())
+            .then(data => {
+                if (!data || data.length === 0) {
+                    document.getElementById('historie').innerHTML = 
+                        '<p style="text-align:center; color:#999;">Noch keine vergangenen Events</p>';
+                    return;
+                }
+                
+                const grouped = {};
+                data.forEach(item => {
+                    const datum = item.Datum;
+                    if (!grouped[datum]) {
+                        grouped[datum] = [];
+                    }
+                    grouped[datum].push(item);
+                });
+                
+                const sortedDates = Object.keys(grouped).sort((a, b) => {
+                    const [dayA, monthA, yearA] = a.split('.');
+                    const [dayB, monthB, yearB] = b.split('.');
+                    return new Date(yearB, monthB-1, dayB) - new Date(yearA, monthA-1, dayA);
+                });
+                
+                let html = '';
+                sortedDates.forEach(datum => {
+                    const events = grouped[datum];
+                    let summeW = 0;
+                    let summeB = 0;
+                    
+                    let itemsHtml = '';
+                    events.forEach(event => {
+                        const w = parseInt(event.Wuerste) || 0;
+                        const b = parseInt(event.Brezn) || 0;
+                        summeW += w;
+                        summeB += b;
+                        itemsHtml += `<div class="historie-item">${event.Name}: ${w} Würste, ${b} Brezn</div>`;
+                    });
+                    
+                    html += `
+                        <div class="historie-event">
+                            <div class="historie-datum">📅 ${datum}</div>
+                            ${itemsHtml}
+                            <div class="historie-stats">
+                                Gesamt: 🌭 ${summeW} Würste | 🥨 ${summeB} Brezn | 👥 ${events.length} Personen
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('historie').innerHTML = html;
+            })
+            .catch(e => {
+                console.error('Fehler beim Laden der Historie:', e);
+                document.getElementById('historie').innerHTML = 
+                    '<p style="color:red;">Fehler beim Laden der Historie!</p>';
+            });
+    }
+    
+    // Event archivieren (Admin)
+    function archivieren() {
+        const password = document.getElementById('admin-password').value;
+        
+        if (!password) {
+            alert('Bitte Admin-Passwort eingeben!');
+            return;
+        }
+        
+        if (!confirm('Wirklich vorzeitig abschließen? Alle aktuellen Bestellungen werden in die Historie verschoben und keine neuen Bestellungen sind bis Montag mehr möglich!')) {
+            return;
+        }
+        
+        const payload = {
+            action: 'archivieren',
+            adminPassword: password
+        };
+        
+        fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            document.getElementById('admin-success').style.display = 'block';
+            document.getElementById('admin-error').style.display = 'none';
+            document.getElementById('admin-password').value = '';
+            
+            // Setze Archivierung
+            archivierungsDatum = new Date().toISOString();
+            statusGeladen = true;
+            updateCountdown();
+            
+            setTimeout(() => {
+                document.getElementById('admin-success').style.display = 'none';
+                laden();
+                ladeHistorie();
+            }, 2000);
+        })
+        .catch(e => {
+            console.error('Fehler:', e);
+            document.getElementById('admin-error').style.display = 'block';
+        });
+    }
+    
+    // Neue Bestellung absenden
+    document.getElementById('form').addEventListener('submit', async e => {
+        e.preventDefault();
+        
+        if (istEventGeschlossen()) {
+            alert('Event wurde geschlossen! Neue Bestellungen ab Montag möglich.');
+            return;
+        }
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Wird gesendet...';
+        
+        const passwortHash = await hashPassword(document.getElementById('passwort').value);
+        
+        const payload = {
+            action: 'create',
+            Name: document.getElementById('name').value,
+            PasswortHash: passwortHash,
+            Wuerste: document.getElementById('wuerste').value,
+            Brezn: document.getElementById('brezn').value
+        };
+        
+        fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            document.getElementById('success').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('form').reset();
+            document.getElementById('wuerste').value = 0;
+            document.getElementById('brezn').value = 0;
+            
+            setTimeout(() => {
+                document.getElementById('success').style.display = 'none';
+                laden();
+            }, 2000);
+        })
+        .catch(e => {
+            console.error('Fehler:', e);
+            document.getElementById('error').style.display = 'block';
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Bestellung absenden';
+        });
+    });
+    
+    // Bestellung zum Bearbeiten laden
+    document.getElementById('edit-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        
+        if (istEventGeschlossen()) {
+            alert('Event wurde geschlossen! Änderungen ab Montag möglich.');
+            return;
+        }
+        
+        const name = document.getElementById('edit-name').value;
+        const passwortHash = await hashPassword(document.getElementById('edit-passwort').value);
+        
+        fetch(APPS_SCRIPT_URL)
+            .then(r => r.json())
+            .then(data => {
+                const bestellung = data.find(item => item.Name === name);
+                
+                if (bestellung) {
+                    if (bestellung.PasswortHash === passwortHash) {
+                        currentEditName = name;
+                        document.getElementById('edit-wuerste').value = bestellung.Wuerste || 0;
+                        document.getElementById('edit-brezn').value = bestellung.Brezn || 0;
+                        document.getElementById('edit-data').style.display = 'block';
+                        document.getElementById('edit-success').style.display = 'none';
+                        document.getElementById('edit-error').style.display = 'none';
+                    } else {
+                        document.getElementById('edit-error').textContent = '✗ Fehler: Passwort falsch!';
+                        document.getElementById('edit-error').style.display = 'block';
+                        document.getElementById('edit-data').style.display = 'none';
+                    }
+                } else {
+                    document.getElementById('edit-error').textContent = '✗ Fehler: Name nicht gefunden!';
+                    document.getElementById('edit-error').style.display = 'block';
+                    document.getElementById('edit-data').style.display = 'none';
+                }
+            })
+            .catch(e => {
+                console.error('Fehler:', e);
+                document.getElementById('edit-error').textContent = '✗ Fehler beim Laden der Daten';
+                document.getElementById('edit-error').style.display = 'block';
+                document.getElementById('edit-data').style.display = 'none';
+            });
+    });
+    
+    // Bestellung aktualisieren
+    function updateOrder() {
+        if (istEventGeschlossen()) {
+            alert('Event wurde geschlossen! Änderungen ab Montag möglich.');
+            return;
+        }
+        
+        const newWuerste = document.getElementById('edit-wuerste').value;
+        const newBrezn = document.getElementById('edit-brezn').value;
+        
+        const payload = {
+            action: 'update',
+            Name: currentEditName,
+            Wuerste: newWuerste,
+            Brezn: newBrezn
+        };
+        
+        fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            document.getElementById('edit-success').style.display = 'block';
+            document.getElementById('edit-error').style.display = 'none';
+            
+            setTimeout(() => {
+                document.getElementById('edit-success').style.display = 'none';
+                document.getElementById('edit-data').style.display = 'none';
+                document.getElementById('edit-form').reset();
+                laden();
+            }, 2000);
+        })
+        .catch(e => {
+            console.error('Update Fehler:', e);
+            document.getElementById('edit-error').style.display = 'block';
+        });
+    }
+    
+    // Beim Start - WICHTIG: Erst Status laden, dann Rest initialisieren
+    ladeArchivierungsStatus(function() {
+        initDatum();
+        laden();
+        ladeHistorie();
+        
+        // Regelmäßige Updates
+        setInterval(laden, 30000);
+        setInterval(ladeHistorie, 60000);
+    });
+</script>
