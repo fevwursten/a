@@ -814,45 +814,28 @@
             const deadline = new Date(eventDatum + 'T09:00:00');
             const deadlineISO = deadline.toISOString();
             
-            fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    action: 'ausserplanmaessig',
-                    adminPassword: password,
-                    deadline: deadlineISO
+            fetch(`${APPS_SCRIPT_URL}?action=ausserplanmaessig&adminPassword=${encodeURIComponent(password)}&deadline=${encodeURIComponent(deadlineISO)}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        schliesseModal();
+                        document.getElementById('admin-success').style.display = 'block';
+                        document.getElementById('admin-error').style.display = 'none';
+                        document.getElementById('admin-password').value = '';
+                        
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        document.getElementById('admin-error').style.display = 'block';
+                        schliesseModal();
+                    }
                 })
-            })
-            .then(() => {
-                schliesseModal();
-                document.getElementById('admin-success').style.display = 'block';
-                document.getElementById('admin-error').style.display = 'none';
-                document.getElementById('admin-password').value = '';
-                
-                ausserplanmaessigDeadline = deadlineISO;
-                archivierungsDatum = null;
-                freigeschaltet = false;
-                statusGeladen = true;
-                
-                const eventDatumObj = new Date(deadlineISO);
-                const datumStr = formatiereDatum(eventDatumObj);
-                document.getElementById('sonder-info').classList.remove('hidden');
-                document.getElementById('sonder-info').textContent = `⭐ Außerplanmäßiges Event: ${datumStr.split(',')[0]}`;
-                
-                updateAdminButtons();
-                updateCountdown();
-                
-                setTimeout(() => {
-                    document.getElementById('admin-success').style.display = 'none';
-                    window.location.reload();
-                }, 2000);
-            })
-            .catch(e => {
-                console.error('Fehler:', e);
-                document.getElementById('admin-error').style.display = 'block';
-                schliesseModal();
-            });
+                .catch(e => {
+                    console.error('Fehler:', e);
+                    document.getElementById('admin-error').style.display = 'block';
+                    schliesseModal();
+                });
         }
         
         async function hashPassword(password) {
@@ -896,46 +879,37 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Wird geprüft...';
             
-            fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    action: 'register',
-                    Name: name,
-                    PasswortHash: passwortHash
-                }),
-                redirect: 'follow'
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    loggedInUser = name;
-                    loggedInPasswordHash = passwortHash;
-                    document.getElementById('logged-in-user').textContent = name;
-                    document.getElementById('auth-mode-register').classList.add('hidden');
-                    document.getElementById('order-form-container').classList.remove('hidden');
-                    document.getElementById('success').textContent = '✓ Account erstellt! Jetzt kannst du bestellen.';
-                    document.getElementById('success').style.display = 'block';
-                    setTimeout(() => {
-                        document.getElementById('success').style.display = 'none';
-                    }, 3000);
-                } else {
-                    document.getElementById('error').textContent = data.message || '✗ Fehler bei der Registrierung!';
+            fetch(`${APPS_SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&hash=${encodeURIComponent(passwortHash)}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        loggedInUser = name;
+                        loggedInPasswordHash = passwortHash;
+                        document.getElementById('logged-in-user').textContent = name;
+                        document.getElementById('auth-mode-register').classList.add('hidden');
+                        document.getElementById('order-form-container').classList.remove('hidden');
+                        document.getElementById('success').textContent = '✓ Account erstellt! Jetzt kannst du bestellen.';
+                        document.getElementById('success').style.display = 'block';
+                        setTimeout(() => {
+                            document.getElementById('success').style.display = 'none';
+                        }, 3000);
+                    } else {
+                        document.getElementById('error').textContent = data.message || '✗ Fehler bei der Registrierung!';
+                        document.getElementById('error').style.display = 'block';
+                        setTimeout(() => {
+                            document.getElementById('error').style.display = 'none';
+                        }, 4000);
+                    }
+                })
+                .catch(e => {
+                    console.error('Fehler:', e);
+                    document.getElementById('error').textContent = '✗ Verbindungsfehler!';
                     document.getElementById('error').style.display = 'block';
-                    setTimeout(() => {
-                        document.getElementById('error').style.display = 'none';
-                    }, 4000);
-                }
-            })
-            .catch(e => {
-                console.error('Fehler:', e);
-                document.getElementById('error').textContent = '✗ Verbindungsfehler!';
-                document.getElementById('error').style.display = 'block';
-            })
-            .finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Account erstellen';
-            });
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Account erstellen';
+                });
         });
         
         // Login
@@ -955,41 +929,32 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Wird geprüft...';
             
-            fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    action: 'login',
-                    Name: name,
-                    PasswortHash: passwortHash
-                }),
-                redirect: 'follow'
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    loggedInUser = data.name;
-                    loggedInPasswordHash = passwortHash;
-                    document.getElementById('logged-in-user').textContent = data.name;
-                    document.getElementById('auth-mode-login').classList.add('hidden');
-                    document.getElementById('order-form-container').classList.remove('hidden');
-                } else {
-                    document.getElementById('error').textContent = data.message || '✗ Login fehlgeschlagen!';
+            fetch(`${APPS_SCRIPT_URL}?action=login&name=${encodeURIComponent(name)}&hash=${encodeURIComponent(passwortHash)}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        loggedInUser = data.name;
+                        loggedInPasswordHash = passwortHash;
+                        document.getElementById('logged-in-user').textContent = data.name;
+                        document.getElementById('auth-mode-login').classList.add('hidden');
+                        document.getElementById('order-form-container').classList.remove('hidden');
+                    } else {
+                        document.getElementById('error').textContent = data.message || '✗ Login fehlgeschlagen!';
+                        document.getElementById('error').style.display = 'block';
+                        setTimeout(() => {
+                            document.getElementById('error').style.display = 'none';
+                        }, 3000);
+                    }
+                })
+                .catch(e => {
+                    console.error('Fehler:', e);
+                    document.getElementById('error').textContent = '✗ Verbindungsfehler!';
                     document.getElementById('error').style.display = 'block';
-                    setTimeout(() => {
-                        document.getElementById('error').style.display = 'none';
-                    }, 3000);
-                }
-            })
-            .catch(e => {
-                console.error('Fehler:', e);
-                document.getElementById('error').textContent = '✗ Verbindungsfehler!';
-                document.getElementById('error').style.display = 'block';
-            })
-            .finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Anmelden';
-            });
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Anmelden';
+                });
         });
         
         // Bestellung aufgeben
@@ -1010,48 +975,38 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Wird gesendet...';
             
-            const payload = {
-                action: 'create',
-                Name: loggedInUser,
-                PasswortHash: loggedInPasswordHash,
-                Wuerste: document.getElementById('wuerste').value,
-                Brezn: document.getElementById('brezn').value
-            };
+            const wuerste = document.getElementById('wuerste').value;
+            const brezn = document.getElementById('brezn').value;
             
-            fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload),
-                redirect: 'follow'
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('success').textContent = '✓ Bestellung erfolgreich!';
-                    document.getElementById('success').style.display = 'block';
-                    document.getElementById('error').style.display = 'none';
-                    document.getElementById('order-form').reset();
-                    document.getElementById('wuerste').value = 0;
-                    document.getElementById('brezn').value = 0;
-                    
-                    setTimeout(() => {
-                        document.getElementById('success').style.display = 'none';
-                        laden();
-                    }, 2000);
-                } else {
-                    document.getElementById('error').textContent = data.message || '✗ Fehler!';
+            fetch(`${APPS_SCRIPT_URL}?action=create&name=${encodeURIComponent(loggedInUser)}&hash=${encodeURIComponent(loggedInPasswordHash)}&wuerste=${wuerste}&brezn=${brezn}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('success').textContent = '✓ Bestellung erfolgreich!';
+                        document.getElementById('success').style.display = 'block';
+                        document.getElementById('error').style.display = 'none';
+                        document.getElementById('order-form').reset();
+                        document.getElementById('wuerste').value = 0;
+                        document.getElementById('brezn').value = 0;
+                        
+                        setTimeout(() => {
+                            document.getElementById('success').style.display = 'none';
+                            laden();
+                        }, 2000);
+                    } else {
+                        document.getElementById('error').textContent = data.message || '✗ Fehler!';
+                        document.getElementById('error').style.display = 'block';
+                    }
+                })
+                .catch(e => {
+                    console.error('Fehler:', e);
+                    document.getElementById('error').textContent = '✗ Verbindungsfehler!';
                     document.getElementById('error').style.display = 'block';
-                }
-            })
-            .catch(e => {
-                console.error('Fehler:', e);
-                document.getElementById('error').textContent = '✗ Verbindungsfehler!';
-                document.getElementById('error').style.display = 'block';
-            })
-            .finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Bestellung absenden';
-            });
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Bestellung absenden';
+                });
         });
         
         function laden() {
@@ -1183,40 +1138,25 @@
                 return;
             }
             
-            fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    action: 'archivieren',
-                    adminPassword: password
+            fetch(`${APPS_SCRIPT_URL}?action=archivieren&adminPassword=${encodeURIComponent(password)}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('admin-success').style.display = 'block';
+                        document.getElementById('admin-error').style.display = 'none';
+                        document.getElementById('admin-password').value = '';
+                        
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        document.getElementById('admin-error').style.display = 'block';
+                    }
                 })
-            })
-            .then(() => {
-                document.getElementById('admin-success').style.display = 'block';
-                document.getElementById('admin-error').style.display = 'none';
-                document.getElementById('admin-password').value = '';
-                
-                archivierungsDatum = new Date().toISOString();
-                ausserplanmaessigDeadline = null;
-                freigeschaltet = false;
-                statusGeladen = true;
-                
-                document.getElementById('sonder-info').classList.add('hidden');
-                
-                updateAdminButtons();
-                updateCountdown();
-                
-                setTimeout(() => {
-                    document.getElementById('admin-success').style.display = 'none';
-                    laden();
-                    ladeHistorie();
-                }, 2000);
-            })
-            .catch(e => {
-                console.error('Fehler:', e);
-                document.getElementById('admin-error').style.display = 'block';
-            });
+                .catch(e => {
+                    console.error('Fehler:', e);
+                    document.getElementById('admin-error').style.display = 'block';
+                });
         }
         
         function freischalten() {
@@ -1228,9 +1168,7 @@
             }
             
             if (ausserplanmaessigDeadline) {
-                const eventDatum = new Date(ausserplanmaessigDeadline);
-                const datumStr = formatiereDatum(eventDatum);
-                alert(`⚠️ Es läuft bereits ein außerplanmäßiges Event!\n\nEvent: ${datumStr.split(',')[0]}, 09:00 Uhr\n\nBitte schließe das laufende Event zuerst ab.`);
+                alert('⚠️ Es läuft bereits ein außerplanmäßiges Event!');
                 return;
             }
             
@@ -1243,40 +1181,25 @@
                 return;
             }
             
-            fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    action: 'freischalten',
-                    adminPassword: password
+            fetch(`${APPS_SCRIPT_URL}?action=freischalten&adminPassword=${encodeURIComponent(password)}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('admin-success').style.display = 'block';
+                        document.getElementById('admin-error').style.display = 'none';
+                        document.getElementById('admin-password').value = '';
+                        
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        document.getElementById('admin-error').style.display = 'block';
+                    }
                 })
-            })
-            .then(() => {
-                document.getElementById('admin-success').style.display = 'block';
-                document.getElementById('admin-error').style.display = 'none';
-                document.getElementById('admin-password').value = '';
-                
-                freigeschaltet = true;
-                archivierungsDatum = null;
-                ausserplanmaessigDeadline = null;
-                statusGeladen = true;
-                
-                document.getElementById('sonder-info').classList.remove('hidden');
-                document.getElementById('sonder-info').textContent = '🔓 Freitagsevent vorzeitig freigeschaltet';
-                
-                updateAdminButtons();
-                updateCountdown();
-                
-                setTimeout(() => {
-                    document.getElementById('admin-success').style.display = 'none';
-                    window.location.reload();
-                }, 2000);
-            })
-            .catch(e => {
-                console.error('Fehler:', e);
-                document.getElementById('admin-error').style.display = 'block';
-            });
+                .catch(e => {
+                    console.error('Fehler:', e);
+                    document.getElementById('admin-error').style.display = 'block';
+                });
         }
         
         document.getElementById('edit-form').addEventListener('submit', async e => {
@@ -1291,54 +1214,45 @@
             const passwort = document.getElementById('edit-passwort').value;
             const passwortHash = await hashPassword(passwort);
             
-            fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    action: 'login',
-                    Name: name,
-                    PasswortHash: passwortHash
-                }),
-                redirect: 'follow'
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (!data.success) {
-                    document.getElementById('edit-error').textContent = data.message || '✗ Name oder Passwort falsch!';
+            fetch(`${APPS_SCRIPT_URL}?action=login&name=${encodeURIComponent(name)}&hash=${encodeURIComponent(passwortHash)}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.success) {
+                        document.getElementById('edit-error').textContent = data.message || '✗ Name oder Passwort falsch!';
+                        document.getElementById('edit-error').style.display = 'block';
+                        document.getElementById('edit-data').style.display = 'none';
+                        return;
+                    }
+                    
+                    currentEditName = data.name;
+                    currentEditPasswordHash = passwortHash;
+                    
+                    return fetch(APPS_SCRIPT_URL);
+                })
+                .then(r => r ? r.json() : null)
+                .then(bestellungen => {
+                    if (!bestellungen) return;
+                    
+                    const bestellung = bestellungen.find(item => item.Name && item.Name.toLowerCase() === currentEditName.toLowerCase());
+                    
+                    if (bestellung) {
+                        document.getElementById('edit-wuerste').value = bestellung.Wuerste || 0;
+                        document.getElementById('edit-brezn').value = bestellung.Brezn || 0;
+                        document.getElementById('edit-data').style.display = 'block';
+                        document.getElementById('edit-success').style.display = 'none';
+                        document.getElementById('edit-error').style.display = 'none';
+                    } else {
+                        document.getElementById('edit-error').textContent = '✗ Keine Bestellung gefunden!';
+                        document.getElementById('edit-error').style.display = 'block';
+                        document.getElementById('edit-data').style.display = 'none';
+                    }
+                })
+                .catch(e => {
+                    console.error('Fehler:', e);
+                    document.getElementById('edit-error').textContent = '✗ Verbindungsfehler!';
                     document.getElementById('edit-error').style.display = 'block';
                     document.getElementById('edit-data').style.display = 'none';
-                    return;
-                }
-                
-                currentEditName = data.name;
-                currentEditPasswordHash = passwortHash;
-                
-                return fetch(APPS_SCRIPT_URL);
-            })
-            .then(r => r ? r.json() : null)
-            .then(bestellungen => {
-                if (!bestellungen) return;
-                
-                const bestellung = bestellungen.find(item => item.Name && item.Name.toLowerCase() === currentEditName.toLowerCase());
-                
-                if (bestellung) {
-                    document.getElementById('edit-wuerste').value = bestellung.Wuerste || 0;
-                    document.getElementById('edit-brezn').value = bestellung.Brezn || 0;
-                    document.getElementById('edit-data').style.display = 'block';
-                    document.getElementById('edit-success').style.display = 'none';
-                    document.getElementById('edit-error').style.display = 'none';
-                } else {
-                    document.getElementById('edit-error').textContent = '✗ Keine Bestellung gefunden!';
-                    document.getElementById('edit-error').style.display = 'block';
-                    document.getElementById('edit-data').style.display = 'none';
-                }
-            })
-            .catch(e => {
-                console.error('Fehler:', e);
-                document.getElementById('edit-error').textContent = '✗ Verbindungsfehler!';
-                document.getElementById('edit-error').style.display = 'block';
-                document.getElementById('edit-data').style.display = 'none';
-            });
+                });
         });
         
         function updateOrder() {
@@ -1350,42 +1264,29 @@
             const newWuerste = document.getElementById('edit-wuerste').value;
             const newBrezn = document.getElementById('edit-brezn').value;
             
-            const payload = {
-                action: 'update',
-                Name: currentEditName,
-                PasswortHash: currentEditPasswordHash,
-                Wuerste: newWuerste,
-                Brezn: newBrezn
-            };
-            
-            fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload),
-                redirect: 'follow'
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('edit-success').style.display = 'block';
-                    document.getElementById('edit-error').style.display = 'none';
-                    
-                    setTimeout(() => {
-                        document.getElementById('edit-success').style.display = 'none';
-                        document.getElementById('edit-data').style.display = 'none';
-                        document.getElementById('edit-form').reset();
-                        laden();
-                    }, 2000);
-                } else {
-                    document.getElementById('edit-error').textContent = '✗ Fehler beim Aktualisieren!';
+            fetch(`${APPS_SCRIPT_URL}?action=update&name=${encodeURIComponent(currentEditName)}&hash=${encodeURIComponent(currentEditPasswordHash)}&wuerste=${newWuerste}&brezn=${newBrezn}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('edit-success').style.display = 'block';
+                        document.getElementById('edit-error').style.display = 'none';
+                        
+                        setTimeout(() => {
+                            document.getElementById('edit-success').style.display = 'none';
+                            document.getElementById('edit-data').style.display = 'none';
+                            document.getElementById('edit-form').reset();
+                            laden();
+                        }, 2000);
+                    } else {
+                        document.getElementById('edit-error').textContent = '✗ Fehler beim Aktualisieren!';
+                        document.getElementById('edit-error').style.display = 'block';
+                    }
+                })
+                .catch(e => {
+                    console.error('Update Fehler:', e);
+                    document.getElementById('edit-error').textContent = '✗ Verbindungsfehler!';
                     document.getElementById('edit-error').style.display = 'block';
-                }
-            })
-            .catch(e => {
-                console.error('Update Fehler:', e);
-                document.getElementById('edit-error').textContent = '✗ Verbindungsfehler!';
-                document.getElementById('edit-error').style.display = 'block';
-            });
+                });
         }
         
         window.onclick = function(event) {
