@@ -10,7 +10,7 @@
             max-width: 900px;
             margin: 50px auto;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #6e031b 0%, #931177 100%);
         }
         .container {
             background: white;
@@ -30,41 +30,56 @@
             box-sizing: border-box;
         }
         button {
-            background: #4CAF50;
+            background: #b9052d;
             color: white;
             border: none;
             cursor: pointer;
             font-weight: bold;
         }
         button:hover {
-            background: #45a049;
+            background: #dd0036;
         }
         button:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
-            background: #999;
+            background: #999 !important;
         }
         button.edit {
-            background: #2196F3;
+            background: #0087a0;
         }
         button.edit:hover {
-            background: #0b7dda;
+            background: #0087a0;
+            filter: brightness(1.1);
         }
         button.admin {
-            background: #ff9800;
+            background: #e67319;
         }
         button.admin:hover {
-            background: #f57c00;
+            background: #e67319;
+            filter: brightness(1.1);
+        }
+        button.admin-success {
+            background: #931177;
+        }
+        button.admin-success:hover {
+            background: #931177;
+            filter: brightness(1.1);
+        }
+        button.secondary {
+            background: #6e031b;
+        }
+        button.secondary:hover {
+            background: #931177;
         }
         .order {
             background: #f9f9f9;
             padding: 15px;
             margin: 10px 0;
-            border-left: 4px solid #4CAF50;
+            border-left: 4px solid #b9052d;
             border-radius: 5px;
         }
         .success {
-            background: #4CAF50;
+            background: #adc646;
             color: white;
             padding: 15px;
             margin: 10px 0;
@@ -72,7 +87,7 @@
             border-radius: 8px;
         }
         .error {
-            background: #f44336;
+            background: #dd0036;
             color: white;
             padding: 15px;
             margin: 10px 0;
@@ -80,13 +95,22 @@
             border-radius: 8px;
         }
         .warning {
-            background: #ff9800;
+            background: #e67319;
             color: white;
             padding: 20px;
             margin: 20px 0;
             border-radius: 8px;
             text-align: center;
             font-size: 18px;
+            font-weight: bold;
+        }
+        .info-badge {
+            background: #931177;
+            color: white;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-align: center;
             font-weight: bold;
         }
         label {
@@ -97,10 +121,10 @@
         }
         h1, h2 {
             text-align: center;
-            color: #333;
+            color: #6e031b;
         }
         h3 {
-            color: #333;
+            color: #6e031b;
             margin-top: 20px;
         }
         .date-subtitle {
@@ -124,7 +148,7 @@
             font-weight: bold;
         }
         .tab.active {
-            background: #4CAF50;
+            background: #b9052d;
             color: white;
         }
         .tab-content {
@@ -134,7 +158,7 @@
             display: block;
         }
         .countdown-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #6e031b 0%, #b9052d 100%);
             color: white;
             padding: 25px;
             margin: 20px 0;
@@ -153,15 +177,18 @@
             letter-spacing: 2px;
         }
         .countdown-expired {
-            background: #f44336;
+            background: linear-gradient(135deg, #dd0036 0%, #b9052d 100%);
+        }
+        .countdown-special {
+            background: linear-gradient(135deg, #931177 0%, #450993 100%);
         }
         .deadline-info {
-            background: #e3f2fd;
-            border-left: 4px solid #2196F3;
+            background: #e8f4f8;
+            border-left: 4px solid #0087a0;
             padding: 15px;
             margin: 20px 0;
             border-radius: 5px;
-            color: #1976d2;
+            color: #171a51;
         }
         .hidden {
             display: none !important;
@@ -171,20 +198,52 @@
             padding: 20px;
             border-radius: 8px;
             margin-top: 20px;
-            border-left: 4px solid #ff9800;
+            border-left: 4px solid #e67319;
+        }
+        .admin-buttons {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
         }
         .historie-event {
             background: #f5f5f5;
-            padding: 20px;
-            margin: 20px 0;
+            padding: 0;
+            margin: 10px 0;
             border-radius: 8px;
-            border-left: 4px solid #9c27b0;
+            border-left: 4px solid #931177;
+            overflow: hidden;
+        }
+        .historie-header {
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            transition: background 0.3s;
+        }
+        .historie-header:hover {
+            background: #f0f0f0;
         }
         .historie-datum {
             font-size: 18px;
             font-weight: bold;
-            color: #9c27b0;
-            margin-bottom: 10px;
+            color: #931177;
+        }
+        .historie-toggle {
+            font-size: 24px;
+            color: #931177;
+            transition: transform 0.3s;
+        }
+        .historie-toggle.open {
+            transform: rotate(180deg);
+        }
+        .historie-content {
+            display: none;
+            padding: 20px;
+        }
+        .historie-content.open {
+            display: block;
         }
         .historie-item {
             padding: 8px;
@@ -193,21 +252,67 @@
             border-radius: 4px;
         }
         .historie-stats {
-            background: #e1bee7;
+            background: linear-gradient(135deg, rgba(147, 17, 119, 0.1) 0%, rgba(147, 17, 119, 0.2) 100%);
             padding: 10px;
             margin-top: 10px;
             border-radius: 4px;
             font-weight: bold;
             text-align: center;
+            color: #6e031b;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .modal-buttons button {
+            flex: 1;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .switch-mode {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+        }
+        .switch-mode a {
+            color: #b9052d;
+            cursor: pointer;
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🥨 Weißwurstfrühstück 🌭</h1>
+        <h1>🥖 Weißwurstfrühstück 🥨</h1>
         <div class="date-subtitle" id="datum-titel">Lädt...</div>
         
-        <!-- Countdown -->
+        <div class="info-badge hidden" id="sonder-info">
+            ⭐ Außerplanmäßiges Event aktiv
+        </div>
+        
         <div class="countdown-box" id="countdown-box">
             <div class="countdown-title">⏰ Zeit bis Bestellende</div>
             <div class="countdown" id="countdown">--:--:--</div>
@@ -217,7 +322,6 @@
             <strong>Anmeldeschluss:</strong> <span id="deadline-text">Freitag, 09:00 Uhr</span> (MEZ/MESZ - Berlin)
         </div>
         
-        <!-- Warnung wenn Deadline überschritten -->
         <div class="warning hidden" id="deadline-warning">
             ⏰ Anmeldeschluss überschritten!<br>
             Bitte wende dich direkt an <strong>Andreas</strong>
@@ -234,21 +338,62 @@
                 <div id="success" class="success">✓ Bestellung erfolgreich!</div>
                 <div id="error" class="error">✗ Fehler beim Senden!</div>
                 
-                <form id="form">
-                    <label>Name: *</label>
-                    <input type="text" id="name" required placeholder="Max Mustermann">
+                <!-- Login/Register Toggle -->
+                <div id="auth-mode-register">
+                    <h3>Erste Bestellung?</h3>
+                    <p class="help-text">Lege dir einen Account an, um Bestellungen aufzugeben.</p>
                     
-                    <label>Passwort: * (zum späteren Ändern)</label>
-                    <input type="password" id="passwort" required placeholder="Mindestens 4 Zeichen" minlength="4">
+                    <form id="register-form">
+                        <label>Name: *</label>
+                        <input type="text" id="reg-name" required placeholder="Max Mustermann">
+                        
+                        <label>Passwort festlegen: *</label>
+                        <input type="password" id="reg-passwort" required placeholder="Mindestens 4 Zeichen" minlength="4">
+                        <p class="help-text">Merke dir dieses Passwort! Du brauchst es zum Ändern deiner Bestellungen.</p>
+                        
+                        <button type="submit" class="secondary">Account erstellen</button>
+                    </form>
                     
-                    <label>Anzahl Weißwürste: *</label>
-                    <input type="number" id="wuerste" value="0" min="0" max="50" required>
+                    <div class="switch-mode">
+                        Schon registriert? <a onclick="switchToLogin()">Hier anmelden</a>
+                    </div>
+                </div>
+                
+                <!-- Login Form -->
+                <div id="auth-mode-login" class="hidden">
+                    <h3>Anmelden & Bestellen</h3>
                     
-                    <label>Anzahl Brezn: *</label>
-                    <input type="number" id="brezn" value="0" min="0" max="50" required>
+                    <form id="login-form">
+                        <label>Name: *</label>
+                        <input type="text" id="login-name" required placeholder="Max Mustermann">
+                        
+                        <label>Passwort: *</label>
+                        <input type="password" id="login-passwort" required placeholder="Dein Passwort">
+                        
+                        <button type="submit" class="secondary">Anmelden</button>
+                    </form>
                     
-                    <button type="submit">Bestellung absenden</button>
-                </form>
+                    <div class="switch-mode">
+                        Noch kein Account? <a onclick="switchToRegister()">Hier registrieren</a>
+                    </div>
+                </div>
+                
+                <!-- Bestellformular (nach Login) -->
+                <div id="order-form-container" class="hidden">
+                    <h3>Deine Bestellung</h3>
+                    <p class="help-text">Angemeldet als: <strong id="logged-in-user"></strong></p>
+                    
+                    <form id="order-form">
+                        <label>Anzahl Weißwürste: *</label>
+                        <input type="number" id="wuerste" value="0" min="0" max="50" required>
+                        
+                        <label>Anzahl Brezn: *</label>
+                        <input type="number" id="brezn" value="0" min="0" max="50" required>
+                        
+                        <button type="submit">Bestellung absenden</button>
+                        <button type="button" onclick="logout()" class="secondary" style="margin-top: 5px;">Abmelden</button>
+                    </form>
+                </div>
             </div>
             
             <!-- Tab: Bestellung ändern -->
@@ -267,7 +412,7 @@
                 </form>
                 
                 <div id="edit-data" style="display:none;">
-                    <hr style="margin: 20px 0;">
+                    <hr style="margin: 20px 0; border-color: #e0e0e0;">
                     <h3>Bestellung ändern:</h3>
                     
                     <label>Anzahl Weißwürste: *</label>
@@ -285,7 +430,7 @@
     <div class="container">
         <h2>📋 Aktuelle Bestellungen</h2>
         <div id="liste">Lädt...</div>
-        <div id="summe" style="margin-top:20px; font-weight:bold; text-align:center; font-size:18px;"></div>
+        <div id="summe" style="margin-top:20px; font-weight:bold; text-align:center; font-size:18px; color:#6e031b;"></div>
     </div>
     
     <div class="container">
@@ -293,15 +438,42 @@
         <div id="historie">Lädt...</div>
     </div>
     
-    <!-- Admin-Bereich ganz unten -->
     <div class="container">
         <div class="admin-section">
             <h3>🔐 Admin-Bereich</h3>
-            <p style="font-size: 14px; color: #666;">Event vorzeitig abschließen</p>
-            <div id="admin-success" class="success">✓ Event vorzeitig abgeschlossen!</div>
+            <div id="admin-success" class="success">✓ Aktion erfolgreich!</div>
             <div id="admin-error" class="error">✗ Falsches Passwort!</div>
+            
             <input type="password" id="admin-password" placeholder="Admin-Passwort" style="margin-top: 10px;">
-            <button onclick="archivieren()" class="admin">Event vorzeitig abschließen</button>
+            
+            <div class="admin-buttons">
+                <button onclick="archivieren()" class="admin">Event vorzeitig abschließen</button>
+                <button onclick="zeigeAusserplanmaessigModal()" class="admin-success" id="btn-ausserplanmaessig">🎉 Neues außerplanmäßiges Event starten</button>
+                <button onclick="freischalten()" class="admin-success" id="btn-freischalten">🔓 Kommendes Freitagsevent freischalten</button>
+            </div>
+            
+            <p style="font-size: 12px; color: #666; margin-top: 15px;">
+                <strong>Hinweis:</strong><br>
+                • "Abschließen" = Archiviert aktuelle Bestellungen, sperrt bis Montag<br>
+                • "Außerplanmäßig" = Startet neues Event mit wählbarem Datum<br>
+                • "Freischalten" = Öffnet Freitagsevent vorzeitig (z.B. schon am Montag)
+            </p>
+        </div>
+    </div>
+
+    <div id="ausserplanmaessig-modal" class="modal">
+        <div class="modal-content">
+            <h3>🎉 Außerplanmäßiges Event</h3>
+            <p>Wann soll das Event stattfinden?</p>
+            <label>Datum des Events: *</label>
+            <input type="date" id="event-datum" required>
+            <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                Bestellungen sind dann bis zum gewählten Tag um 09:00 Uhr möglich.
+            </p>
+            <div class="modal-buttons">
+                <button onclick="schliesseModal()" style="background: #999;">Abbrechen</button>
+                <button onclick="starteAusserplanmaessig()" class="admin-success">Event starten</button>
+            </div>
         </div>
     </div>
 
@@ -309,16 +481,19 @@
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdmOwK3MeR__gaScFtslQO0jfHoJhi4nzISR2l26CmSMQKCh8BxQ0gcmMq7izQiq0rng/exec';
         
         let currentEditName = '';
+        let currentEditPasswordHash = '';
+        let loggedInUser = null;
+        let loggedInPasswordHash = null;
         let countdownInterval = null;
         let archivierungsDatum = null;
+        let ausserplanmaessigDeadline = null;
+        let freigeschaltet = false;
         let statusGeladen = false;
         
-        // Hole aktuelle Zeit in Berlin (MEZ/MESZ)
         function getBerlinTime() {
             return new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
         }
         
-        // Berechne den aktuellen Freitag-Zeitraum
         function getAktuellerFreitagZeitraum() {
             const jetzt = getBerlinTime();
             const tagDerWoche = jetzt.getDay();
@@ -337,7 +512,6 @@
             return letzterFreitag;
         }
         
-        // Berechne nächsten Freitag 09:00 in Berlin-Zeit
         function getNaechstenFreitagDeadline() {
             const jetzt = getBerlinTime();
             const tagDerWoche = jetzt.getDay();
@@ -362,27 +536,67 @@
             return deadline;
         }
         
-        // Formatiere Datum schön
         function formatiereDatum(datum) {
             const optionen = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             return datum.toLocaleDateString('de-DE', optionen);
         }
         
-        // Prüfe ob Event geschlossen ist
+        function toggleHistorieEvent(datum) {
+            const content = document.getElementById('historie-content-' + datum);
+            const toggle = document.getElementById('historie-toggle-' + datum);
+            
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                toggle.classList.remove('open');
+            } else {
+                content.classList.add('open');
+                toggle.classList.add('open');
+            }
+        }
+        
+        function switchToLogin() {
+            document.getElementById('auth-mode-register').classList.add('hidden');
+            document.getElementById('auth-mode-login').classList.remove('hidden');
+        }
+        
+        function switchToRegister() {
+            document.getElementById('auth-mode-login').classList.add('hidden');
+            document.getElementById('auth-mode-register').classList.remove('hidden');
+        }
+        
+        function logout() {
+            loggedInUser = null;
+            loggedInPasswordHash = null;
+            document.getElementById('order-form-container').classList.add('hidden');
+            document.getElementById('auth-mode-register').classList.remove('hidden');
+            document.getElementById('order-form').reset();
+            document.getElementById('wuerste').value = 0;
+            document.getElementById('brezn').value = 0;
+        }
+        
         function istEventGeschlossen() {
-            // Warte bis Status geladen ist
             if (!statusGeladen) {
                 return false;
             }
             
-            // Wenn nicht archiviert, prüfe nur normale Deadline
+            if (ausserplanmaessigDeadline) {
+                const jetzt = getBerlinTime();
+                const deadline = new Date(ausserplanmaessigDeadline);
+                return jetzt >= deadline;
+            }
+            
+            if (freigeschaltet) {
+                const jetzt = getBerlinTime();
+                const deadline = getNaechstenFreitagDeadline();
+                return jetzt >= deadline;
+            }
+            
             if (!archivierungsDatum) {
                 const jetzt = getBerlinTime();
                 const deadline = getNaechstenFreitagDeadline();
                 return jetzt >= deadline;
             }
             
-            // Wenn archiviert, prüfe ob wir noch im gleichen Freitag-Zeitraum sind
             const archivDatum = new Date(archivierungsDatum);
             const aktuellerFreitagStart = getAktuellerFreitagZeitraum();
             const naechsterFreitagStart = new Date(aktuellerFreitagStart);
@@ -390,29 +604,64 @@
             
             const jetzt = getBerlinTime();
             
-            // Wenn Archivierung im aktuellen Freitag-Zeitraum war, ist es noch geschlossen
             if (archivDatum >= aktuellerFreitagStart && jetzt < naechsterFreitagStart) {
                 return true;
             }
             
-            // Neuer Zeitraum hat begonnen - öffne wieder
             archivierungsDatum = null;
             
-            // Prüfe normale Deadline
             const deadline = getNaechstenFreitagDeadline();
             return jetzt >= deadline;
         }
         
-        // Lade Archivierungs-Status (mit Callback)
+        function updateAdminButtons() {
+            const btnAusserplanmaessig = document.getElementById('btn-ausserplanmaessig');
+            const btnFreischalten = document.getElementById('btn-freischalten');
+            
+            if (ausserplanmaessigDeadline) {
+                btnAusserplanmaessig.disabled = true;
+                btnAusserplanmaessig.textContent = '🎉 Außerplanmäßiges Event läuft';
+                btnFreischalten.disabled = true;
+                btnFreischalten.textContent = '🔓 Event bereits aktiv';
+            } 
+            else if (freigeschaltet) {
+                btnAusserplanmaessig.disabled = true;
+                btnAusserplanmaessig.textContent = '🎉 Event bereits aktiv';
+                btnFreischalten.disabled = true;
+                btnFreischalten.textContent = '🔓 Freitagsevent läuft';
+            }
+            else {
+                btnAusserplanmaessig.disabled = false;
+                btnAusserplanmaessig.textContent = '🎉 Neues außerplanmäßiges Event starten';
+                btnFreischalten.disabled = false;
+                btnFreischalten.textContent = '🔓 Kommendes Freitagsevent freischalten';
+            }
+        }
+        
         function ladeArchivierungsStatus(callback) {
             fetch(`${APPS_SCRIPT_URL}?type=status`)
                 .then(r => r.json())
                 .then(data => {
                     if (data.archiviert) {
                         archivierungsDatum = data.archiviert;
-                        console.log('Archivierung gefunden:', archivierungsDatum);
                     }
+                    ausserplanmaessigDeadline = data.ausserplanmaessigDeadline || null;
+                    freigeschaltet = data.freigeschaltet || false;
+                    
                     statusGeladen = true;
+                    
+                    if (ausserplanmaessigDeadline) {
+                        const eventDatum = new Date(ausserplanmaessigDeadline);
+                        const datumStr = formatiereDatum(eventDatum);
+                        document.getElementById('sonder-info').classList.remove('hidden');
+                        document.getElementById('sonder-info').textContent = `⭐ Außerplanmäßiges Event: ${datumStr.split(',')[0]}`;
+                    } else if (freigeschaltet) {
+                        document.getElementById('sonder-info').classList.remove('hidden');
+                        document.getElementById('sonder-info').textContent = '🔓 Freitagsevent vorzeitig freigeschaltet';
+                    }
+                    
+                    updateAdminButtons();
+                    
                     if (callback) callback();
                 })
                 .catch(e => {
@@ -422,19 +671,46 @@
                 });
         }
         
-        // Update Countdown
         function updateCountdown() {
             const jetzt = getBerlinTime();
-            const deadline = getNaechstenFreitagDeadline();
+            let deadline;
+            
+            if (ausserplanmaessigDeadline) {
+                deadline = new Date(ausserplanmaessigDeadline);
+            } else {
+                deadline = getNaechstenFreitagDeadline();
+            }
+            
             const diff = deadline - jetzt;
             
             const countdownElement = document.getElementById('countdown');
             const countdownBox = document.getElementById('countdown-box');
             const geschlossen = istEventGeschlossen();
             
+            if (ausserplanmaessigDeadline) {
+                countdownBox.classList.remove('countdown-expired');
+                countdownBox.classList.add('countdown-special');
+                document.getElementById('countdown-box').querySelector('.countdown-title').textContent = '⭐ Außerplanmäßiges Event - Zeit bis Bestellende';
+                
+                if (!geschlossen) {
+                    document.getElementById('deadline-warning').classList.add('hidden');
+                    document.getElementById('form-container').classList.remove('hidden');
+                }
+            } else if (freigeschaltet) {
+                countdownBox.classList.remove('countdown-expired');
+                countdownBox.classList.add('countdown-special');
+                document.getElementById('deadline-warning').classList.add('hidden');
+                document.getElementById('form-container').classList.remove('hidden');
+                document.getElementById('countdown-box').querySelector('.countdown-title').textContent = '🔓 Vorzeitig geöffnet - Zeit bis Freitag 09:00';
+            } else {
+                countdownBox.classList.remove('countdown-special');
+                document.getElementById('countdown-box').querySelector('.countdown-title').textContent = '⏰ Zeit bis Bestellende';
+            }
+            
             if (diff <= 0 || geschlossen) {
-                countdownElement.textContent = geschlossen ? 'GESCHLOSSEN' : 'ABGELAUFEN';
+                countdownElement.textContent = 'GESCHLOSSEN';
                 countdownBox.classList.add('countdown-expired');
+                countdownBox.classList.remove('countdown-special');
                 
                 const warningText = archivierungsDatum ? 
                     '⏰ Event wurde vorzeitig geschlossen!<br>Bitte wende dich direkt an <strong>Andreas</strong><br><small>Neue Bestellungen ab nächstem Montag möglich</small>' :
@@ -463,9 +739,15 @@
             countdownElement.textContent = `${tageStr}${stundenStr}:${minutenStr}:${sekundenStr}`;
         }
         
-        // Initialisiere Datum im Titel
         function initDatum() {
-            const deadline = getNaechstenFreitagDeadline();
+            let deadline;
+            
+            if (ausserplanmaessigDeadline) {
+                deadline = new Date(ausserplanmaessigDeadline);
+            } else {
+                deadline = getNaechstenFreitagDeadline();
+            }
+            
             const datumText = formatiereDatum(deadline);
             document.getElementById('datum-titel').textContent = datumText;
             
@@ -486,7 +768,93 @@
             }
         }
         
-        // Hash-Funktion (SHA-256)
+        function zeigeAusserplanmaessigModal() {
+            const password = document.getElementById('admin-password').value;
+            
+            if (!password) {
+                alert('Bitte Admin-Passwort eingeben!');
+                return;
+            }
+            
+            if (ausserplanmaessigDeadline) {
+                const eventDatum = new Date(ausserplanmaessigDeadline);
+                const datumStr = formatiereDatum(eventDatum);
+                alert(`⚠️ Es läuft bereits ein außerplanmäßiges Event!\n\nEvent: ${datumStr.split(',')[0]}, 09:00 Uhr\n\nBitte schließe das laufende Event zuerst ab.`);
+                return;
+            }
+            
+            if (freigeschaltet) {
+                const freitagDatum = getNaechstenFreitagDeadline();
+                const datumStr = formatiereDatum(freitagDatum);
+                alert(`⚠️ Das Freitagsevent ist bereits freigeschaltet!\n\nEvent: ${datumStr.split(',')[0]}, 09:00 Uhr\n\nBitte schließe das laufende Event zuerst ab.`);
+                return;
+            }
+            
+            const heute = new Date();
+            const heuteStr = heute.toISOString().split('T')[0];
+            document.getElementById('event-datum').min = heuteStr;
+            document.getElementById('event-datum').value = heuteStr;
+            
+            document.getElementById('ausserplanmaessig-modal').style.display = 'block';
+        }
+        
+        function schliesseModal() {
+            document.getElementById('ausserplanmaessig-modal').style.display = 'none';
+        }
+        
+        function starteAusserplanmaessig() {
+            const eventDatum = document.getElementById('event-datum').value;
+            
+            if (!eventDatum) {
+                alert('Bitte Datum auswählen!');
+                return;
+            }
+            
+            const password = document.getElementById('admin-password').value;
+            const deadline = new Date(eventDatum + 'T09:00:00');
+            const deadlineISO = deadline.toISOString();
+            
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    action: 'ausserplanmaessig',
+                    adminPassword: password,
+                    deadline: deadlineISO
+                })
+            })
+            .then(() => {
+                schliesseModal();
+                document.getElementById('admin-success').style.display = 'block';
+                document.getElementById('admin-error').style.display = 'none';
+                document.getElementById('admin-password').value = '';
+                
+                ausserplanmaessigDeadline = deadlineISO;
+                archivierungsDatum = null;
+                freigeschaltet = false;
+                statusGeladen = true;
+                
+                const eventDatumObj = new Date(deadlineISO);
+                const datumStr = formatiereDatum(eventDatumObj);
+                document.getElementById('sonder-info').classList.remove('hidden');
+                document.getElementById('sonder-info').textContent = `⭐ Außerplanmäßiges Event: ${datumStr.split(',')[0]}`;
+                
+                updateAdminButtons();
+                updateCountdown();
+                
+                setTimeout(() => {
+                    document.getElementById('admin-success').style.display = 'none';
+                    window.location.reload();
+                }, 2000);
+            })
+            .catch(e => {
+                console.error('Fehler:', e);
+                document.getElementById('admin-error').style.display = 'block';
+                schliesseModal();
+            });
+        }
+        
         async function hashPassword(password) {
             const encoder = new TextEncoder();
             const data = encoder.encode(password);
@@ -496,7 +864,6 @@
             return hashHex;
         }
         
-        // Tab-Wechsel
         function showTab(tab) {
             if (istEventGeschlossen()) return;
             
@@ -512,7 +879,181 @@
             }
         }
         
-        // Bestellungen laden
+        // Registrierung
+        document.getElementById('register-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            
+            if (istEventGeschlossen()) {
+                alert('Event wurde geschlossen!');
+                return;
+            }
+            
+            const name = document.getElementById('reg-name').value;
+            const passwort = document.getElementById('reg-passwort').value;
+            const passwortHash = await hashPassword(passwort);
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Wird geprüft...';
+            
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    action: 'register',
+                    Name: name,
+                    PasswortHash: passwortHash
+                }),
+                redirect: 'follow'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    loggedInUser = name;
+                    loggedInPasswordHash = passwortHash;
+                    document.getElementById('logged-in-user').textContent = name;
+                    document.getElementById('auth-mode-register').classList.add('hidden');
+                    document.getElementById('order-form-container').classList.remove('hidden');
+                    document.getElementById('success').textContent = '✓ Account erstellt! Jetzt kannst du bestellen.';
+                    document.getElementById('success').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('success').style.display = 'none';
+                    }, 3000);
+                } else {
+                    document.getElementById('error').textContent = data.message || '✗ Fehler bei der Registrierung!';
+                    document.getElementById('error').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('error').style.display = 'none';
+                    }, 4000);
+                }
+            })
+            .catch(e => {
+                console.error('Fehler:', e);
+                document.getElementById('error').textContent = '✗ Verbindungsfehler!';
+                document.getElementById('error').style.display = 'block';
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Account erstellen';
+            });
+        });
+        
+        // Login
+        document.getElementById('login-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            
+            if (istEventGeschlossen()) {
+                alert('Event wurde geschlossen!');
+                return;
+            }
+            
+            const name = document.getElementById('login-name').value;
+            const passwort = document.getElementById('login-passwort').value;
+            const passwortHash = await hashPassword(passwort);
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Wird geprüft...';
+            
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    action: 'login',
+                    Name: name,
+                    PasswortHash: passwortHash
+                }),
+                redirect: 'follow'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    loggedInUser = data.name;
+                    loggedInPasswordHash = passwortHash;
+                    document.getElementById('logged-in-user').textContent = data.name;
+                    document.getElementById('auth-mode-login').classList.add('hidden');
+                    document.getElementById('order-form-container').classList.remove('hidden');
+                } else {
+                    document.getElementById('error').textContent = data.message || '✗ Login fehlgeschlagen!';
+                    document.getElementById('error').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('error').style.display = 'none';
+                    }, 3000);
+                }
+            })
+            .catch(e => {
+                console.error('Fehler:', e);
+                document.getElementById('error').textContent = '✗ Verbindungsfehler!';
+                document.getElementById('error').style.display = 'block';
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Anmelden';
+            });
+        });
+        
+        // Bestellung aufgeben
+        document.getElementById('order-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            
+            if (istEventGeschlossen()) {
+                alert('Event wurde geschlossen!');
+                return;
+            }
+            
+            if (!loggedInUser || !loggedInPasswordHash) {
+                alert('Bitte erst anmelden!');
+                return;
+            }
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Wird gesendet...';
+            
+            const payload = {
+                action: 'create',
+                Name: loggedInUser,
+                PasswortHash: loggedInPasswordHash,
+                Wuerste: document.getElementById('wuerste').value,
+                Brezn: document.getElementById('brezn').value
+            };
+            
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload),
+                redirect: 'follow'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('success').textContent = '✓ Bestellung erfolgreich!';
+                    document.getElementById('success').style.display = 'block';
+                    document.getElementById('error').style.display = 'none';
+                    document.getElementById('order-form').reset();
+                    document.getElementById('wuerste').value = 0;
+                    document.getElementById('brezn').value = 0;
+                    
+                    setTimeout(() => {
+                        document.getElementById('success').style.display = 'none';
+                        laden();
+                    }, 2000);
+                } else {
+                    document.getElementById('error').textContent = data.message || '✗ Fehler!';
+                    document.getElementById('error').style.display = 'block';
+                }
+            })
+            .catch(e => {
+                console.error('Fehler:', e);
+                document.getElementById('error').textContent = '✗ Verbindungsfehler!';
+                document.getElementById('error').style.display = 'block';
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Bestellung absenden';
+            });
+        });
+        
         function laden() {
             fetch(APPS_SCRIPT_URL)
                 .then(r => r.json())
@@ -535,7 +1076,7 @@
                     
                     document.getElementById('liste').innerHTML = html;
                     document.getElementById('summe').innerHTML = 
-                        `🌭 ${summeW} Würste | 🥨 ${summeB} Brezn`;
+                        `🥖 ${summeW} Würste | 🥨 ${summeB} Brezn`;
                 })
                 .catch(e => {
                     console.error('Fehler beim Laden:', e);
@@ -544,7 +1085,6 @@
                 });
         }
         
-        // Historie laden
         function ladeHistorie() {
             fetch(`${APPS_SCRIPT_URL}?type=historie`)
                 .then(r => r.json())
@@ -557,7 +1097,18 @@
                     
                     const grouped = {};
                     data.forEach(item => {
-                        const datum = item.Datum;
+                        let datum = item.Datum;
+                        
+                        if (datum && (datum.includes('T') || datum.includes('Z'))) {
+                            const dateObj = new Date(datum);
+                            datum = dateObj.toLocaleDateString('de-DE', { 
+                                weekday: 'short', 
+                                day: '2-digit', 
+                                month: '2-digit', 
+                                year: 'numeric' 
+                            });
+                        }
+                        
                         if (!grouped[datum]) {
                             grouped[datum] = [];
                         }
@@ -565,13 +1116,20 @@
                     });
                     
                     const sortedDates = Object.keys(grouped).sort((a, b) => {
-                        const [dayA, monthA, yearA] = a.split('.');
-                        const [dayB, monthB, yearB] = b.split('.');
-                        return new Date(yearB, monthB-1, dayB) - new Date(yearA, monthA-1, dayA);
+                        const parseGermanDate = (dateStr) => {
+                            const cleanStr = dateStr.includes(',') ? dateStr.split(', ')[1] : dateStr;
+                            const parts = cleanStr.split('.');
+                            return new Date(parts[2], parts[1] - 1, parts[0]);
+                        };
+                        
+                        const dateA = parseGermanDate(a);
+                        const dateB = parseGermanDate(b);
+                        
+                        return dateB - dateA;
                     });
                     
                     let html = '';
-                    sortedDates.forEach(datum => {
+                    sortedDates.forEach((datum, index) => {
                         const events = grouped[datum];
                         let summeW = 0;
                         let summeB = 0;
@@ -585,12 +1143,20 @@
                             itemsHtml += `<div class="historie-item">${event.Name}: ${w} Würste, ${b} Brezn</div>`;
                         });
                         
+                        const isOpen = index === 0 ? 'open' : '';
+                        const datumId = datum.replace(/\./g, '-').replace(/,/g, '').replace(/\s/g, '-');
+                        
                         html += `
                             <div class="historie-event">
-                                <div class="historie-datum">📅 ${datum}</div>
-                                ${itemsHtml}
-                                <div class="historie-stats">
-                                    Gesamt: 🌭 ${summeW} Würste | 🥨 ${summeB} Brezn | 👥 ${events.length} Personen
+                                <div class="historie-header" onclick="toggleHistorieEvent('${datumId}')">
+                                    <div class="historie-datum">📅 ${datum}</div>
+                                    <div class="historie-toggle ${isOpen}" id="historie-toggle-${datumId}">▼</div>
+                                </div>
+                                <div class="historie-content ${isOpen}" id="historie-content-${datumId}">
+                                    ${itemsHtml}
+                                    <div class="historie-stats">
+                                        Gesamt: 🥖 ${summeW} Würste | 🥨 ${summeB} Brezn | 👥 ${events.length} Personen
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -605,7 +1171,6 @@
                 });
         }
         
-        // Event archivieren (Admin)
         function archivieren() {
             const password = document.getElementById('admin-password').value;
             
@@ -614,29 +1179,32 @@
                 return;
             }
             
-            if (!confirm('Wirklich vorzeitig abschließen? Alle aktuellen Bestellungen werden in die Historie verschoben und keine neuen Bestellungen sind bis Montag mehr möglich!')) {
+            if (!confirm('Wirklich vorzeitig abschließen? Alle aktuellen Bestellungen werden in die Historie verschoben!')) {
                 return;
             }
-            
-            const payload = {
-                action: 'archivieren',
-                adminPassword: password
-            };
             
             fetch(APPS_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
+                body: JSON.stringify({
+                    action: 'archivieren',
+                    adminPassword: password
+                })
             })
             .then(() => {
                 document.getElementById('admin-success').style.display = 'block';
                 document.getElementById('admin-error').style.display = 'none';
                 document.getElementById('admin-password').value = '';
                 
-                // Setze Archivierung
                 archivierungsDatum = new Date().toISOString();
+                ausserplanmaessigDeadline = null;
+                freigeschaltet = false;
                 statusGeladen = true;
+                
+                document.getElementById('sonder-info').classList.add('hidden');
+                
+                updateAdminButtons();
                 updateCountdown();
                 
                 setTimeout(() => {
@@ -651,105 +1219,131 @@
             });
         }
         
-        // Neue Bestellung absenden
-        document.getElementById('form').addEventListener('submit', async e => {
-            e.preventDefault();
+        function freischalten() {
+            const password = document.getElementById('admin-password').value;
             
-            if (istEventGeschlossen()) {
-                alert('Event wurde geschlossen! Neue Bestellungen ab Montag möglich.');
+            if (!password) {
+                alert('Bitte Admin-Passwort eingeben!');
                 return;
             }
             
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Wird gesendet...';
+            if (ausserplanmaessigDeadline) {
+                const eventDatum = new Date(ausserplanmaessigDeadline);
+                const datumStr = formatiereDatum(eventDatum);
+                alert(`⚠️ Es läuft bereits ein außerplanmäßiges Event!\n\nEvent: ${datumStr.split(',')[0]}, 09:00 Uhr\n\nBitte schließe das laufende Event zuerst ab.`);
+                return;
+            }
             
-            const passwortHash = await hashPassword(document.getElementById('passwort').value);
+            if (freigeschaltet) {
+                alert('⚠️ Das Freitagsevent ist bereits freigeschaltet!');
+                return;
+            }
             
-            const payload = {
-                action: 'create',
-                Name: document.getElementById('name').value,
-                PasswortHash: passwortHash,
-                Wuerste: document.getElementById('wuerste').value,
-                Brezn: document.getElementById('brezn').value
-            };
+            if (!confirm('Freitagsevent vorzeitig freischalten? Bestellungen sind dann bis Freitag 09:00 möglich!')) {
+                return;
+            }
             
             fetch(APPS_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
+                body: JSON.stringify({
+                    action: 'freischalten',
+                    adminPassword: password
+                })
             })
             .then(() => {
-                document.getElementById('success').style.display = 'block';
-                document.getElementById('error').style.display = 'none';
-                document.getElementById('form').reset();
-                document.getElementById('wuerste').value = 0;
-                document.getElementById('brezn').value = 0;
+                document.getElementById('admin-success').style.display = 'block';
+                document.getElementById('admin-error').style.display = 'none';
+                document.getElementById('admin-password').value = '';
+                
+                freigeschaltet = true;
+                archivierungsDatum = null;
+                ausserplanmaessigDeadline = null;
+                statusGeladen = true;
+                
+                document.getElementById('sonder-info').classList.remove('hidden');
+                document.getElementById('sonder-info').textContent = '🔓 Freitagsevent vorzeitig freigeschaltet';
+                
+                updateAdminButtons();
+                updateCountdown();
                 
                 setTimeout(() => {
-                    document.getElementById('success').style.display = 'none';
-                    laden();
+                    document.getElementById('admin-success').style.display = 'none';
+                    window.location.reload();
                 }, 2000);
             })
             .catch(e => {
                 console.error('Fehler:', e);
-                document.getElementById('error').style.display = 'block';
-            })
-            .finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Bestellung absenden';
+                document.getElementById('admin-error').style.display = 'block';
             });
-        });
+        }
         
-        // Bestellung zum Bearbeiten laden
         document.getElementById('edit-form').addEventListener('submit', async e => {
             e.preventDefault();
             
             if (istEventGeschlossen()) {
-                alert('Event wurde geschlossen! Änderungen ab Montag möglich.');
+                alert('Event wurde geschlossen!');
                 return;
             }
             
             const name = document.getElementById('edit-name').value;
-            const passwortHash = await hashPassword(document.getElementById('edit-passwort').value);
+            const passwort = document.getElementById('edit-passwort').value;
+            const passwortHash = await hashPassword(passwort);
             
-            fetch(APPS_SCRIPT_URL)
-                .then(r => r.json())
-                .then(data => {
-                    const bestellung = data.find(item => item.Name === name);
-                    
-                    if (bestellung) {
-                        if (bestellung.PasswortHash === passwortHash) {
-                            currentEditName = name;
-                            document.getElementById('edit-wuerste').value = bestellung.Wuerste || 0;
-                            document.getElementById('edit-brezn').value = bestellung.Brezn || 0;
-                            document.getElementById('edit-data').style.display = 'block';
-                            document.getElementById('edit-success').style.display = 'none';
-                            document.getElementById('edit-error').style.display = 'none';
-                        } else {
-                            document.getElementById('edit-error').textContent = '✗ Fehler: Passwort falsch!';
-                            document.getElementById('edit-error').style.display = 'block';
-                            document.getElementById('edit-data').style.display = 'none';
-                        }
-                    } else {
-                        document.getElementById('edit-error').textContent = '✗ Fehler: Name nicht gefunden!';
-                        document.getElementById('edit-error').style.display = 'block';
-                        document.getElementById('edit-data').style.display = 'none';
-                    }
-                })
-                .catch(e => {
-                    console.error('Fehler:', e);
-                    document.getElementById('edit-error').textContent = '✗ Fehler beim Laden der Daten';
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    action: 'login',
+                    Name: name,
+                    PasswortHash: passwortHash
+                }),
+                redirect: 'follow'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success) {
+                    document.getElementById('edit-error').textContent = data.message || '✗ Name oder Passwort falsch!';
                     document.getElementById('edit-error').style.display = 'block';
                     document.getElementById('edit-data').style.display = 'none';
-                });
+                    return;
+                }
+                
+                currentEditName = data.name;
+                currentEditPasswordHash = passwortHash;
+                
+                return fetch(APPS_SCRIPT_URL);
+            })
+            .then(r => r ? r.json() : null)
+            .then(bestellungen => {
+                if (!bestellungen) return;
+                
+                const bestellung = bestellungen.find(item => item.Name && item.Name.toLowerCase() === currentEditName.toLowerCase());
+                
+                if (bestellung) {
+                    document.getElementById('edit-wuerste').value = bestellung.Wuerste || 0;
+                    document.getElementById('edit-brezn').value = bestellung.Brezn || 0;
+                    document.getElementById('edit-data').style.display = 'block';
+                    document.getElementById('edit-success').style.display = 'none';
+                    document.getElementById('edit-error').style.display = 'none';
+                } else {
+                    document.getElementById('edit-error').textContent = '✗ Keine Bestellung gefunden!';
+                    document.getElementById('edit-error').style.display = 'block';
+                    document.getElementById('edit-data').style.display = 'none';
+                }
+            })
+            .catch(e => {
+                console.error('Fehler:', e);
+                document.getElementById('edit-error').textContent = '✗ Verbindungsfehler!';
+                document.getElementById('edit-error').style.display = 'block';
+                document.getElementById('edit-data').style.display = 'none';
+            });
         });
         
-        // Bestellung aktualisieren
         function updateOrder() {
             if (istEventGeschlossen()) {
-                alert('Event wurde geschlossen! Änderungen ab Montag möglich.');
+                alert('Event wurde geschlossen!');
                 return;
             }
             
@@ -759,40 +1353,53 @@
             const payload = {
                 action: 'update',
                 Name: currentEditName,
+                PasswortHash: currentEditPasswordHash,
                 Wuerste: newWuerste,
                 Brezn: newBrezn
             };
             
             fetch(APPS_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
+                redirect: 'follow'
             })
-            .then(() => {
-                document.getElementById('edit-success').style.display = 'block';
-                document.getElementById('edit-error').style.display = 'none';
-                
-                setTimeout(() => {
-                    document.getElementById('edit-success').style.display = 'none';
-                    document.getElementById('edit-data').style.display = 'none';
-                    document.getElementById('edit-form').reset();
-                    laden();
-                }, 2000);
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('edit-success').style.display = 'block';
+                    document.getElementById('edit-error').style.display = 'none';
+                    
+                    setTimeout(() => {
+                        document.getElementById('edit-success').style.display = 'none';
+                        document.getElementById('edit-data').style.display = 'none';
+                        document.getElementById('edit-form').reset();
+                        laden();
+                    }, 2000);
+                } else {
+                    document.getElementById('edit-error').textContent = '✗ Fehler beim Aktualisieren!';
+                    document.getElementById('edit-error').style.display = 'block';
+                }
             })
             .catch(e => {
                 console.error('Update Fehler:', e);
+                document.getElementById('edit-error').textContent = '✗ Verbindungsfehler!';
                 document.getElementById('edit-error').style.display = 'block';
             });
         }
         
-        // Beim Start - WICHTIG: Erst Status laden, dann Rest initialisieren
+        window.onclick = function(event) {
+            const modal = document.getElementById('ausserplanmaessig-modal');
+            if (event.target === modal) {
+                schliesseModal();
+            }
+        }
+        
         ladeArchivierungsStatus(function() {
             initDatum();
             laden();
             ladeHistorie();
             
-            // Regelmäßige Updates
             setInterval(laden, 30000);
             setInterval(ladeHistorie, 60000);
         });
