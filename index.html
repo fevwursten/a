@@ -292,6 +292,136 @@
             color: #666;
             margin-top: 5px;
         }
+        
+        /* Siegertreppe Styles */
+        .podium-section {
+            margin: 30px 0;
+        }
+        .podium-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .podium-tab {
+            padding: 10px 20px;
+            background: #e0e0e0;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .podium-tab.active {
+            background: #b9052d;
+            color: white;
+        }
+        .podium-container {
+            display: none;
+        }
+        .podium-container.active {
+            display: block;
+        }
+        .podium-wrapper {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+        .podium-block {
+            flex: 1;
+        }
+        .podium-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #6e031b;
+            margin-bottom: 20px;
+        }
+        .podium {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 10px;
+            height: 250px;
+            margin-top: 20px;
+        }
+        .podium-place {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .podium-person {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .podium-name {
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .podium-count {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .podium-step {
+            width: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px 8px 0 0;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+        }
+        .place-1 {
+            order: 2;
+        }
+        .place-1 .podium-step {
+            height: 140px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        }
+        .place-1 .podium-person {
+            font-size: 50px;
+        }
+        .place-2 {
+            order: 1;
+        }
+        .place-2 .podium-step {
+            height: 100px;
+            background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%);
+        }
+        .place-3 {
+            order: 3;
+        }
+        .place-3 .podium-step {
+            height: 70px;
+            background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%);
+        }
+        .year-selector {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .year-selector select {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 2px solid #b9052d;
+            border-radius: 8px;
+            background: white;
+            color: #6e031b;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -399,6 +529,58 @@
         <div id="summe" style="margin-top:20px; font-weight:bold; text-align:center; font-size:18px; color:#6e031b;"></div>
     </div>
     
+    <!-- Siegertreppe -->
+    <div class="container">
+        <h2>🏆 Hall of Fame</h2>
+        
+        <div class="podium-tabs">
+            <button class="podium-tab active" onclick="showPodiumTab('alltime')">All-Time Champions</button>
+            <button class="podium-tab" onclick="showPodiumTab('year')">Jahres-Bestenliste</button>
+        </div>
+        
+        <!-- All-Time Podium -->
+        <div id="podium-alltime" class="podium-container active">
+            <div class="podium-wrapper">
+                <div class="podium-block">
+                    <div class="podium-title">🥖 Würste All-Time</div>
+                    <div id="podium-wuerste-alltime" class="podium">
+                        <div class="no-data">Lädt...</div>
+                    </div>
+                </div>
+                <div class="podium-block">
+                    <div class="podium-title">🥨 Brezn All-Time</div>
+                    <div id="podium-brezn-alltime" class="podium">
+                        <div class="no-data">Lädt...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Year Podium -->
+        <div id="podium-year" class="podium-container">
+            <div class="year-selector">
+                <label for="year-select" style="display:inline; margin-right:10px;">Jahr auswählen:</label>
+                <select id="year-select" onchange="updateYearPodium()">
+                    <option value="">Lädt...</option>
+                </select>
+            </div>
+            <div class="podium-wrapper">
+                <div class="podium-block">
+                    <div class="podium-title">🥖 Würste <span id="year-title-wuerste"></span></div>
+                    <div id="podium-wuerste-year" class="podium">
+                        <div class="no-data">Bitte Jahr auswählen</div>
+                    </div>
+                </div>
+                <div class="podium-block">
+                    <div class="podium-title">🥨 Brezn <span id="year-title-brezn"></span></div>
+                    <div id="podium-brezn-year" class="podium">
+                        <div class="no-data">Bitte Jahr auswählen</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
         <h2>📜 Historie vergangener Events</h2>
         <div id="historie">Lädt...</div>
@@ -457,6 +639,7 @@
         let ausserplanmaessigDeadline = null;
         let freigeschaltet = false;
         let statusGeladen = false;
+        let historieData = [];
         
         function getBerlinTime() {
             return new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
@@ -821,7 +1004,157 @@
             }
         }
         
-        // Auth-Form Handler (intelligentes Login/Register)
+        function showPodiumTab(tab) {
+            document.querySelectorAll('.podium-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.podium-container').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'alltime') {
+                document.querySelectorAll('.podium-tab')[0].classList.add('active');
+                document.getElementById('podium-alltime').classList.add('active');
+            } else {
+                document.querySelectorAll('.podium-tab')[1].classList.add('active');
+                document.getElementById('podium-year').classList.add('active');
+            }
+        }
+        
+        function createPodium(data, containerId, type) {
+            const container = document.getElementById(containerId);
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="no-data">Noch keine Daten vorhanden</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            const places = [
+                { rank: 1, emoji: '🥇', class: 'place-1' },
+                { rank: 2, emoji: '🥈', class: 'place-2' },
+                { rank: 3, emoji: '🥉', class: 'place-3' }
+            ];
+            
+            places.forEach((place, index) => {
+                if (index < data.length) {
+                    const person = data[index];
+                    const placeDiv = document.createElement('div');
+                    placeDiv.className = `podium-place ${place.class}`;
+                    
+                    placeDiv.innerHTML = `
+                        <div class="podium-person">${place.emoji}</div>
+                        <div class="podium-name">${person.name}</div>
+                        <div class="podium-count">${person.count} ${type === 'wuerste' ? '🥖' : '🥨'}</div>
+                        <div class="podium-step">${place.rank}</div>
+                    `;
+                    
+                    container.appendChild(placeDiv);
+                }
+            });
+        }
+        
+        function berechneBestenliste() {
+            if (!historieData || historieData.length === 0) return;
+            
+            // All-Time Berechnung
+            const allTimeWuerste = {};
+            const allTimeBrezn = {};
+            
+            historieData.forEach(item => {
+                const name = item.Name;
+                const wuerste = parseInt(item.Wuerste) || 0;
+                const brezn = parseInt(item.Brezn) || 0;
+                
+                allTimeWuerste[name] = (allTimeWuerste[name] || 0) + wuerste;
+                allTimeBrezn[name] = (allTimeBrezn[name] || 0) + brezn;
+            });
+            
+            // Sortiere und erstelle Top 3
+            const top3Wuerste = Object.entries(allTimeWuerste)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([name, count]) => ({ name, count }));
+            
+            const top3Brezn = Object.entries(allTimeBrezn)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([name, count]) => ({ name, count }));
+            
+            createPodium(top3Wuerste, 'podium-wuerste-alltime', 'wuerste');
+            createPodium(top3Brezn, 'podium-brezn-alltime', 'brezn');
+            
+            // Jahre extrahieren für Dropdown
+            const years = new Set();
+            historieData.forEach(item => {
+                let datum = item.Datum;
+                if (datum && (datum.includes('T') || datum.includes('Z'))) {
+                    const dateObj = new Date(datum);
+                    years.add(dateObj.getFullYear());
+                } else if (datum) {
+                    const parts = datum.split('.');
+                    if (parts.length >= 3) {
+                        years.add(parseInt(parts[2]));
+                    }
+                }
+            });
+            
+            const sortedYears = Array.from(years).sort((a, b) => b - a);
+            const yearSelect = document.getElementById('year-select');
+            yearSelect.innerHTML = sortedYears.map(year => 
+                `<option value="${year}">${year}</option>`
+            ).join('');
+            
+            if (sortedYears.length > 0) {
+                updateYearPodium();
+            }
+        }
+        
+        function updateYearPodium() {
+            const selectedYear = document.getElementById('year-select').value;
+            if (!selectedYear) return;
+            
+            document.getElementById('year-title-wuerste').textContent = selectedYear;
+            document.getElementById('year-title-brezn').textContent = selectedYear;
+            
+            const yearWuerste = {};
+            const yearBrezn = {};
+            
+            historieData.forEach(item => {
+                let year = null;
+                let datum = item.Datum;
+                
+                if (datum && (datum.includes('T') || datum.includes('Z'))) {
+                    const dateObj = new Date(datum);
+                    year = dateObj.getFullYear();
+                } else if (datum) {
+                    const parts = datum.split('.');
+                    if (parts.length >= 3) {
+                        year = parseInt(parts[2]);
+                    }
+                }
+                
+                if (year === parseInt(selectedYear)) {
+                    const name = item.Name;
+                    const wuerste = parseInt(item.Wuerste) || 0;
+                    const brezn = parseInt(item.Brezn) || 0;
+                    
+                    yearWuerste[name] = (yearWuerste[name] || 0) + wuerste;
+                    yearBrezn[name] = (yearBrezn[name] || 0) + brezn;
+                }
+            });
+            
+            const top3Wuerste = Object.entries(yearWuerste)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([name, count]) => ({ name, count }));
+            
+            const top3Brezn = Object.entries(yearBrezn)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([name, count]) => ({ name, count }));
+            
+            createPodium(top3Wuerste, 'podium-wuerste-year', 'wuerste');
+            createPodium(top3Brezn, 'podium-brezn-year', 'brezn');
+        }
+        
         document.getElementById('auth-form').addEventListener('submit', async e => {
             e.preventDefault();
             
@@ -838,31 +1171,24 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Wird geprüft...';
             
-            // Versuche Login
             fetch(`${APPS_SCRIPT_URL}?action=login&name=${encodeURIComponent(name)}&hash=${encodeURIComponent(passwortHash)}`)
                 .then(r => r.json())
                 .then(data => {
                     if (data.success) {
-                        // Login erfolgreich
                         loggedInUser = data.name;
                         loggedInPasswordHash = passwortHash;
                         document.getElementById('logged-in-user').textContent = data.name;
                         document.getElementById('auth-form-container').classList.add('hidden');
                         document.getElementById('order-form-container').classList.remove('hidden');
-                        
-                        // Formular zurücksetzen
                         document.getElementById('auth-form').reset();
                     } else if (data.error === 'user_not_found') {
-                        // Benutzer existiert nicht - frage ob registrieren
                         const registrieren = confirm(`Der Benutzer "${name}" existiert noch nicht.\n\nMöchtest du einen neuen Account anlegen?`);
                         
                         if (registrieren) {
-                            // Registriere neuen Benutzer
                             fetch(`${APPS_SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&hash=${encodeURIComponent(passwortHash)}`)
                                 .then(r => r.json())
                                 .then(regData => {
                                     if (regData.success) {
-                                        // Registrierung erfolgreich - automatisch einloggen
                                         loggedInUser = name;
                                         loggedInPasswordHash = passwortHash;
                                         document.getElementById('logged-in-user').textContent = name;
@@ -877,7 +1203,6 @@
                                         
                                         document.getElementById('auth-form').reset();
                                     } else {
-                                        // Name existiert bereits (Case-Insensitive-Check)
                                         document.getElementById('error').textContent = regData.message || '✗ Dieser Name ist bereits vergeben!';
                                         document.getElementById('error').style.display = 'block';
                                         setTimeout(() => {
@@ -891,7 +1216,6 @@
                                     document.getElementById('error').style.display = 'block';
                                 });
                         } else {
-                            // Benutzer will nicht registrieren
                             document.getElementById('error').textContent = '✗ Bitte gib einen registrierten Namen ein.';
                             document.getElementById('error').style.display = 'block';
                             setTimeout(() => {
@@ -899,14 +1223,12 @@
                             }, 3000);
                         }
                     } else if (data.error === 'wrong_password') {
-                        // Falsches Passwort
                         document.getElementById('error').textContent = '✗ Falsches Passwort!';
                         document.getElementById('error').style.display = 'block';
                         setTimeout(() => {
                             document.getElementById('error').style.display = 'none';
                         }, 3000);
                     } else {
-                        // Anderer Fehler
                         document.getElementById('error').textContent = data.message || '✗ Login fehlgeschlagen!';
                         document.getElementById('error').style.display = 'block';
                         setTimeout(() => {
@@ -925,7 +1247,6 @@
                 });
         });
         
-        // Bestellung aufgeben
         document.getElementById('order-form').addEventListener('submit', async e => {
             e.preventDefault();
             
@@ -1012,11 +1333,16 @@
             fetch(`${APPS_SCRIPT_URL}?type=historie`)
                 .then(r => r.json())
                 .then(data => {
+                    historieData = data || [];
+                    
                     if (!data || data.length === 0) {
                         document.getElementById('historie').innerHTML = 
                             '<p style="text-align:center; color:#999;">Noch keine vergangenen Events</p>';
                         return;
                     }
+                    
+                    // Berechne Bestenliste
+                    berechneBestenliste();
                     
                     const grouped = {};
                     data.forEach(item => {
