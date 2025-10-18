@@ -292,16 +292,6 @@
             color: #666;
             margin-top: 5px;
         }
-        .switch-mode {
-            text-align: center;
-            margin-top: 15px;
-            color: #666;
-        }
-        .switch-mode a {
-            color: #b9052d;
-            cursor: pointer;
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
@@ -338,44 +328,20 @@
                 <div id="success" class="success">✓ Bestellung erfolgreich!</div>
                 <div id="error" class="error">✗ Fehler beim Senden!</div>
                 
-                <!-- Login/Register Toggle -->
-                <div id="auth-mode-register">
-                    <h3>Erste Bestellung?</h3>
-                    <p class="help-text">Lege dir einen Account an, um Bestellungen aufzugeben.</p>
+                <!-- Einheitliches Login/Register Form -->
+                <div id="auth-form-container">
+                    <h3>Anmelden</h3>
+                    <p class="help-text">Gib deinen Namen und Passwort ein. Existiert der Name noch nicht, kannst du einen neuen Account anlegen.</p>
                     
-                    <form id="register-form">
+                    <form id="auth-form">
                         <label>Name: *</label>
-                        <input type="text" id="reg-name" required placeholder="Max Mustermann">
-                        
-                        <label>Passwort festlegen: *</label>
-                        <input type="password" id="reg-passwort" required placeholder="Mindestens 4 Zeichen" minlength="4">
-                        <p class="help-text">Merke dir dieses Passwort! Du brauchst es zum Ändern deiner Bestellungen.</p>
-                        
-                        <button type="submit" class="secondary">Account erstellen</button>
-                    </form>
-                    
-                    <div class="switch-mode">
-                        Schon registriert? <a onclick="switchToLogin()">Hier anmelden</a>
-                    </div>
-                </div>
-                
-                <!-- Login Form -->
-                <div id="auth-mode-login" class="hidden">
-                    <h3>Anmelden & Bestellen</h3>
-                    
-                    <form id="login-form">
-                        <label>Name: *</label>
-                        <input type="text" id="login-name" required placeholder="Max Mustermann">
+                        <input type="text" id="auth-name" required placeholder="Max Mustermann" autocomplete="username">
                         
                         <label>Passwort: *</label>
-                        <input type="password" id="login-passwort" required placeholder="Dein Passwort">
+                        <input type="password" id="auth-passwort" required placeholder="Mindestens 4 Zeichen" minlength="4" autocomplete="current-password">
                         
-                        <button type="submit" class="secondary">Anmelden</button>
+                        <button type="submit">Weiter</button>
                     </form>
-                    
-                    <div class="switch-mode">
-                        Noch kein Account? <a onclick="switchToRegister()">Hier registrieren</a>
-                    </div>
                 </div>
                 
                 <!-- Bestellformular (nach Login) -->
@@ -403,10 +369,10 @@
                 
                 <form id="edit-form">
                     <label>Dein Name: *</label>
-                    <input type="text" id="edit-name" required placeholder="Max Mustermann">
+                    <input type="text" id="edit-name" required placeholder="Max Mustermann" autocomplete="username">
                     
                     <label>Dein Passwort: *</label>
-                    <input type="password" id="edit-passwort" required placeholder="Dein Passwort">
+                    <input type="password" id="edit-passwort" required placeholder="Dein Passwort" autocomplete="current-password">
                     
                     <button type="submit" class="edit">Bestellung laden</button>
                 </form>
@@ -444,7 +410,9 @@
             <div id="admin-success" class="success">✓ Aktion erfolgreich!</div>
             <div id="admin-error" class="error">✗ Falsches Passwort!</div>
             
-            <input type="password" id="admin-password" placeholder="Admin-Passwort" style="margin-top: 10px;">
+            <form id="admin-form" onsubmit="return false;">
+                <input type="password" id="admin-password" placeholder="Admin-Passwort" autocomplete="current-password" style="margin-top: 10px;">
+            </form>
             
             <div class="admin-buttons">
                 <button onclick="archivieren()" class="admin">Event vorzeitig abschließen</button>
@@ -554,22 +522,13 @@
             }
         }
         
-        function switchToLogin() {
-            document.getElementById('auth-mode-register').classList.add('hidden');
-            document.getElementById('auth-mode-login').classList.remove('hidden');
-        }
-        
-        function switchToRegister() {
-            document.getElementById('auth-mode-login').classList.add('hidden');
-            document.getElementById('auth-mode-register').classList.remove('hidden');
-        }
-        
         function logout() {
             loggedInUser = null;
             loggedInPasswordHash = null;
             document.getElementById('order-form-container').classList.add('hidden');
-            document.getElementById('auth-mode-register').classList.remove('hidden');
+            document.getElementById('auth-form-container').classList.remove('hidden');
             document.getElementById('order-form').reset();
+            document.getElementById('auth-form').reset();
             document.getElementById('wuerste').value = 0;
             document.getElementById('brezn').value = 0;
         }
@@ -862,8 +821,8 @@
             }
         }
         
-        // Registrierung
-        document.getElementById('register-form').addEventListener('submit', async e => {
+        // Auth-Form Handler (intelligentes Login/Register)
+        document.getElementById('auth-form').addEventListener('submit', async e => {
             e.preventDefault();
             
             if (istEventGeschlossen()) {
@@ -871,74 +830,83 @@
                 return;
             }
             
-            const name = document.getElementById('reg-name').value;
-            const passwort = document.getElementById('reg-passwort').value;
+            const name = document.getElementById('auth-name').value;
+            const passwort = document.getElementById('auth-passwort').value;
             const passwortHash = await hashPassword(passwort);
             
             const submitBtn = e.target.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Wird geprüft...';
             
-            fetch(`${APPS_SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&hash=${encodeURIComponent(passwortHash)}`)
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        loggedInUser = name;
-                        loggedInPasswordHash = passwortHash;
-                        document.getElementById('logged-in-user').textContent = name;
-                        document.getElementById('auth-mode-register').classList.add('hidden');
-                        document.getElementById('order-form-container').classList.remove('hidden');
-                        document.getElementById('success').textContent = '✓ Account erstellt! Jetzt kannst du bestellen.';
-                        document.getElementById('success').style.display = 'block';
-                        setTimeout(() => {
-                            document.getElementById('success').style.display = 'none';
-                        }, 3000);
-                    } else {
-                        document.getElementById('error').textContent = data.message || '✗ Fehler bei der Registrierung!';
-                        document.getElementById('error').style.display = 'block';
-                        setTimeout(() => {
-                            document.getElementById('error').style.display = 'none';
-                        }, 4000);
-                    }
-                })
-                .catch(e => {
-                    console.error('Fehler:', e);
-                    document.getElementById('error').textContent = '✗ Verbindungsfehler!';
-                    document.getElementById('error').style.display = 'block';
-                })
-                .finally(() => {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Account erstellen';
-                });
-        });
-        
-        // Login
-        document.getElementById('login-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            
-            if (istEventGeschlossen()) {
-                alert('Event wurde geschlossen!');
-                return;
-            }
-            
-            const name = document.getElementById('login-name').value;
-            const passwort = document.getElementById('login-passwort').value;
-            const passwortHash = await hashPassword(passwort);
-            
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Wird geprüft...';
-            
+            // Versuche Login
             fetch(`${APPS_SCRIPT_URL}?action=login&name=${encodeURIComponent(name)}&hash=${encodeURIComponent(passwortHash)}`)
                 .then(r => r.json())
                 .then(data => {
                     if (data.success) {
+                        // Login erfolgreich
                         loggedInUser = data.name;
                         loggedInPasswordHash = passwortHash;
                         document.getElementById('logged-in-user').textContent = data.name;
-                        document.getElementById('auth-mode-login').classList.add('hidden');
+                        document.getElementById('auth-form-container').classList.add('hidden');
                         document.getElementById('order-form-container').classList.remove('hidden');
+                        
+                        // Formular zurücksetzen
+                        document.getElementById('auth-form').reset();
+                    } else if (data.error === 'user_not_found') {
+                        // Benutzer existiert nicht - frage ob registrieren
+                        const registrieren = confirm(`Der Benutzer "${name}" existiert noch nicht.\n\nMöchtest du einen neuen Account anlegen?`);
+                        
+                        if (registrieren) {
+                            // Registriere neuen Benutzer
+                            fetch(`${APPS_SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&hash=${encodeURIComponent(passwortHash)}`)
+                                .then(r => r.json())
+                                .then(regData => {
+                                    if (regData.success) {
+                                        // Registrierung erfolgreich - automatisch einloggen
+                                        loggedInUser = name;
+                                        loggedInPasswordHash = passwortHash;
+                                        document.getElementById('logged-in-user').textContent = name;
+                                        document.getElementById('auth-form-container').classList.add('hidden');
+                                        document.getElementById('order-form-container').classList.remove('hidden');
+                                        
+                                        document.getElementById('success').textContent = '✓ Account erstellt! Jetzt kannst du bestellen.';
+                                        document.getElementById('success').style.display = 'block';
+                                        setTimeout(() => {
+                                            document.getElementById('success').style.display = 'none';
+                                        }, 3000);
+                                        
+                                        document.getElementById('auth-form').reset();
+                                    } else {
+                                        // Name existiert bereits (Case-Insensitive-Check)
+                                        document.getElementById('error').textContent = regData.message || '✗ Dieser Name ist bereits vergeben!';
+                                        document.getElementById('error').style.display = 'block';
+                                        setTimeout(() => {
+                                            document.getElementById('error').style.display = 'none';
+                                        }, 4000);
+                                    }
+                                })
+                                .catch(e => {
+                                    console.error('Registrierungsfehler:', e);
+                                    document.getElementById('error').textContent = '✗ Verbindungsfehler bei der Registrierung!';
+                                    document.getElementById('error').style.display = 'block';
+                                });
+                        } else {
+                            // Benutzer will nicht registrieren
+                            document.getElementById('error').textContent = '✗ Bitte gib einen registrierten Namen ein.';
+                            document.getElementById('error').style.display = 'block';
+                            setTimeout(() => {
+                                document.getElementById('error').style.display = 'none';
+                            }, 3000);
+                        }
+                    } else if (data.error === 'wrong_password') {
+                        // Falsches Passwort
+                        document.getElementById('error').textContent = '✗ Falsches Passwort!';
+                        document.getElementById('error').style.display = 'block';
+                        setTimeout(() => {
+                            document.getElementById('error').style.display = 'none';
+                        }, 3000);
                     } else {
+                        // Anderer Fehler
                         document.getElementById('error').textContent = data.message || '✗ Login fehlgeschlagen!';
                         document.getElementById('error').style.display = 'block';
                         setTimeout(() => {
@@ -953,7 +921,7 @@
                 })
                 .finally(() => {
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Anmelden';
+                    submitBtn.textContent = 'Weiter';
                 });
         });
         
